@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <style>
+        
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    max-width: 400px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+}
+
+input {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 20px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.error-message {
+    color: #ff0000;
+    margin-top: 10px;
+}        
+    </style>
+</head>
+<body>
+    <div class="oTop">
+        <div class="oContainer">
+            <form action="/confirm" method="post">
+                <div class="oform">
+                    <label for="number">OTP</label>
+                    <input type="number" class="oControl" name="otpe">
+                </div>
+                <button type="submit" class="oButton">Verify</button>
+            </form>
+            <form id="resendForm" action="/resend-otp" method="post">
+                <button id="resendButton" type="submit" disabled>Resend</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript code for handling OTP resend functionality
+
+        var resendButton = document.getElementById('resendButton');
+        var resendForm = document.getElementById('resendForm');
+
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(function() {
+                resendButton.removeAttribute('disabled');
+            }, 5000); // Enable resend button after 5 seconds
+        });
+
+        resendForm.addEventListener('submit', function(event) {
+            // Prevent the default form submission
+            event.preventDefault();
+
+            // Disable the button immediately when clicked
+            resendButton.disabled = true;
+
+            // Submit the form
+            fetch('/resend-otp', {
+                method: 'POST',
+                body: new FormData(resendForm)
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data); // Show response message (e.g., "OTP has been resent")
+            })
+            .catch(error => {
+                console.error('Error resending OTP:', error);
+                alert('Failed to resend OTP. Please try again later.');
+            })
+            .finally(() => {
+                // Re-enable the button after 5 seconds
+                setTimeout(function() {
+                    resendButton.removeAttribute('disabled');
+                }, 5000);
+            });
+        });
+
+        window.addEventListener("beforeunload", function(event) {
+            // Send a request to the server to notify it about the closure of the page
+            fetch("/notify-close", {
+            method: "POST"
+    });
+});
+    </script>
+</body>
+</html>
